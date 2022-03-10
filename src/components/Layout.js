@@ -13,10 +13,8 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import FolderIcon from "@mui/icons-material/Folder";
 import { useTheme } from "@mui/material/styles";
-import HomeIcon from "@mui/icons-material/Home";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -34,18 +32,23 @@ export default function Layout() {
   const menuItems = [
     {
       text: "Home",
-      path: "/admin",
-      icon: <HomeIcon style={{ color: "white" }} />,
+      path: "/merchandise",
+      icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
     },
     {
-      text: "Users",
-      path: "/admin/users",
-      icon: <AccountBoxIcon style={{ color: "white" }} />,
+      text: "Samples",
+      path: "/merchandise/samples",
+      icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
     },
     {
-      text: "Departments",
-      path: "/admin/departments",
-      icon: <FolderIcon style={{ color: "white" }} />,
+      text: "Orders",
+      path: "/merchandise/orders",
+      icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
+    },
+    {
+      text: "Production",
+      path: "/merchandise/production",
+      icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
     },
   ];
 
@@ -85,7 +88,13 @@ export default function Layout() {
         minHeight: "100vh",
       }}
     >
-      <AppBar position="sticky">
+      <AppBar
+        position="sticky"
+        color=""
+        sx={{
+          color: theme.palette.primary.main,
+        }}
+      >
         <Toolbar>
           <IconButton
             size="large"
@@ -103,7 +112,7 @@ export default function Layout() {
             component="div"
             sx={{ flexGrow: 1 }}
           >
-            Leave Application System
+            Merchandise
           </Typography>
           {localStorage.getItem("token") ? (
             <Button
@@ -129,9 +138,9 @@ export default function Layout() {
       <Drawer anchor="left" open={open} onClose={toggleDrawer(false)}>
         <Box
           sx={{
-            backgroundColor: theme.palette.primary.main,
+            // backgroundColor: theme.palette.primary.main,
             height: "100%",
-            color: "white",
+            color: theme.palette.primary.main,
           }}
         >
           <Toolbar sx={{ width: "170px" }}>
@@ -146,7 +155,7 @@ export default function Layout() {
               <MenuIcon />
             </IconButton>
             <Typography variant="body1" noWrap component="div">
-              Leave Application System
+              Merchandise
             </Typography>
           </Toolbar>
           <Divider />

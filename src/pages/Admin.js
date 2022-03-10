@@ -32,19 +32,19 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const statsData = [
   {
-    title: "Total Users",
+    title: "Total Orders",
     value: "1,000",
     color: "primary",
   },
   {
-    title: "Total Departments",
-    value: "500",
+    title: "Total Buyers",
+    value: "1,000",
     color: "secondary",
   },
   {
-    title: "Total Leave Requests",
-    value: "1,000",
-    color: "primary",
+    title: "Total Samples",
+    value: "200",
+    color: "secondary",
   },
 ];
 

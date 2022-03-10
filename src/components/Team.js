@@ -1,12 +1,38 @@
 import React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { CardActionArea, Divider, Box } from "@mui/material";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { useTheme } from "@emotion/react";
+import img1 from "../assets/team/img-1.png";
+import img2 from "../assets/team/img-2.png";
+import img3 from "../assets/team/img-3.png";
+import img4 from "../assets/team/img-4.png";
+
+const teams = [
+  {
+    name: "Eric TUYISHIME",
+    title: "Merchandise",
+    image: img1,
+  },
+  {
+    name: "Eric NIYIBIZI",
+    title: "Merchandise",
+    image: img2,
+  },
+  {
+    name: "Annah MUKARUSANGA",
+    title: "Merchandise",
+    image: img3,
+  },
+  {
+    name: "Dominah KAMARAYIKA",
+    title: "Merchandise",
+    image: img4,
+  },
+];
 
 const Team = () => {
   const theme = useTheme();
@@ -21,34 +47,44 @@ const Team = () => {
         </Box>
         <Grid
           container
-          spacing={{ xs: 2, md: 10 }}
+          spacing={{ xs: 2, md: 6 }}
           columns={{ xs: 12, sm: 12, md: 12 }}
           sx={{ pb: 8 }}
         >
-          {Array.from(Array(4)).map((_, index) => (
+          {teams.map((team, index) => (
             <Grid item xs={12} sm={6} md={3} key={index}>
               <Card variant="outlined">
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                  alt="Teammates"
-                />
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: { md: "250px", sm: "350px" },
+                  }}
+                >
+                  <img
+                    src={team.image}
+                    alt=""
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
                 <CardActionArea>
                   <CardContent sx={{ textAlign: "center" }}>
                     <Typography
                       gutterBottom
-                      variant="h6"
+                      variant="body1"
                       component="div"
                       color={theme.palette.dark.main}
                     >
-                      John Doe
+                      {team.name}
                     </Typography>
                     <Typography
                       variant="body2"
                       color={theme.palette.secondary.text}
                     >
-                      Production Manager
+                      {team.title}
                     </Typography>
                   </CardContent>
                 </CardActionArea>

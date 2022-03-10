@@ -2,11 +2,12 @@ import * as React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Layout from "../components/Layout";
-import Department from "../pages/Department";
 import Login from "../pages/Login";
-import Users from "../pages/Users";
 import Admin from "../pages/Admin";
 import Home from "../pages/Home";
+import Orders from "../pages/Orders";
+import Samples from "../pages/Samples";
+import Production from "../pages/Production";
 
 const theme = createTheme({
   palette: {
@@ -43,10 +44,11 @@ const Index = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="admin" element={<Layout />}>
+          <Route path="merchandise" element={<Layout />}>
             <Route exact path="" element={<Admin />} />
-            <Route exact path="departments" element={<Department />} />
-            <Route exact path="users" element={<Users />} />
+            <Route exact path="Samples" element={<Samples />} />
+            <Route exact path="Orders" element={<Orders />} />
+            <Route exact path="Production" element={<Production />} />
           </Route>
         </Routes>
       </Router>
