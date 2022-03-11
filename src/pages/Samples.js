@@ -13,6 +13,8 @@ import {
   Input,
   Autocomplete,
   Snackbar,
+  useMediaQuery,
+  DialogContentText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
@@ -32,6 +34,8 @@ import {
   selectGetAllSamples,
 } from "../features/samples/getAllSamples";
 import { addNewSample } from "../features/samples/addNewSample";
+import { deleteSample } from "../features/samples/deleteSample";
+import { updateSample } from "../features/samples/updateSample";
 
 export const ColorButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -39,13 +43,21 @@ export const ColorButton = styled(Button)(({ theme }) => ({
 }));
 
 const Samples = () => {
-    const theme = useTheme();
+  const theme = useTheme();
   const dispatch = useDispatch();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [state, setState] = React.useState({
     open: false,
     openSnackbar: false,
     loading: false,
+    formTitle: "",
+    successMessage: "",
+    createForm: "none",
+    editForm: "none",
+    sampleId: "",
+    openDeleteForm: false,
+    status: "Pending"
   });
 
   const validationSchema = Yup.object().shape({
@@ -60,12 +72,13 @@ const Samples = () => {
     register,
     handleSubmit,
     resetField,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = (data) => {
+  const handleCreate = (data) => {
     setState({ ...state, loading: true });
     const sample = new FormData();
     sample.append("style_no", data.style_no);
@@ -75,7 +88,12 @@ const Samples = () => {
     dispatch(addNewSample(sample))
       .then((res) => {
         console.log(res);
-        setState({ ...state, open: false, openSnackbar: true });
+        setState({
+          ...state,
+          open: false,
+          openSnackbar: true,
+          successMessage: "Sample added successfully",
+        });
         resetField("style_no");
         resetField("image");
         resetField("status");
@@ -94,12 +112,91 @@ const Samples = () => {
       });
   };
 
-  const handleOpen = () => {
-    setState({ ...state, open: true });
+  const handleDelete = () => {
+    setState({ ...state, loading: true });
+    dispatch(deleteSample(state.sampleId)).then((res) => {
+      console.log(res);
+      setState({
+        ...state,
+        openDeleteForm: false,
+        openSnackbar: true,
+        successMessage: "Sample deleted successfully",
+        loading: false,
+      });
+      setTimeout(() => {
+        setState({
+          ...state,
+          openSnackbar: false,
+          openDeleteForm: false,
+        });
+      }, 3000);
+      dispatch(getAllSamples());
+    });
+  };
+
+  const handleUpdate = (data) => {
+    console.log(data);
+    const sample = {
+      style_no: data.style_no,
+      id: state.sampleId,
+      status: data.status,
+    };
+    setState({ ...state, loading: true });
+    dispatch(updateSample(sample)).then((res) => {
+      console.log(res);
+      setState({
+        ...state,
+        open: false,
+        openSnackbar: true,
+        successMessage: "Sample updated successfully",
+        loading: false,
+      });
+      setTimeout(() => {
+        setState({
+          ...state,
+          openSnackbar: false,
+          open: false,
+        });
+      }, 3000);
+      dispatch(getAllSamples());
+    });
+  };
+
+  const handleCreateForm = () => {
+    setState({
+      ...state,
+      open: true,
+      formTitle: "Add New Sample",
+      createForm: "block",
+      editForm: "none",
+    });
+  };
+
+  const handleEditForm = (data) => {
+    setState({
+      ...state,
+      open: true,
+      formTitle: "Edit Sample",
+      editForm: "flex",
+      createForm: "none",
+      sampleId: data._id,
+      status: data.status,
+    });
+    setValue("style_no", data.style_no);
+    setValue("status", data.status);
+    setValue("image", data.image);
+  };
+
+  const handleDeleteDialog = (data) => {
+    setState({
+      ...state,
+      openDeleteForm: true,
+      sampleId: data._id,
+    });
   };
 
   const handleClose = () => {
-    setState({ ...state, open: false });
+    setState({ ...state, open: false, openDeleteForm: false });
   };
 
   useEffect(() => {
@@ -182,7 +279,19 @@ const Samples = () => {
             <StyleText variant="body1" component="div">
               {data.style_no}
             </StyleText>
-            <StatusText variant="caption">{data.status}</StatusText>
+            <StatusText
+              variant="caption"
+              sx={{
+                backgroundColor:
+                  data.status === "Received"
+                    ? theme.palette.primary.main
+                    : data.status === "Inline"
+                    ? theme.palette.warning.main
+                    : theme.palette.dark.main,
+              }}
+            >
+              {data.status}
+            </StatusText>
           </Box>
           <Box
             sx={{
@@ -192,10 +301,10 @@ const Samples = () => {
               padding: "0 .5rem",
             }}
           >
-            <IconButton color="error">
+            <IconButton color="error" onClick={() => handleDeleteDialog(data)}>
               <DeleteIcon />
             </IconButton>
-            <IconButton color="primary">
+            <IconButton color="primary" onClick={() => handleEditForm(data)}>
               <EditIcon />
             </IconButton>
           </Box>
@@ -213,7 +322,7 @@ const Samples = () => {
         <ColorButton
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={handleOpen}
+          onClick={handleCreateForm}
         >
           Add
         </ColorButton>
@@ -225,9 +334,11 @@ const Samples = () => {
       >
         {content}
       </Grid>
-      <Dialog open={state.open} onClose={handleClose}>
-        <DialogTitle>Add New Sample</DialogTitle>
-        <DialogContent>
+      <Dialog open={state.open} onClose={handleClose} fullScreen={fullScreen}>
+        <DialogTitle sx={{ backgroundColor: theme.palette.secondary.main }}>
+          {state.formTitle}
+        </DialogTitle>
+        <DialogContent sx={{ minWidth: { md: "400px" } }}>
           <TextField
             autoFocus
             margin="dense"
@@ -244,20 +355,19 @@ const Samples = () => {
             id="clear-on-escape"
             clearOnEscape
             options={["Pending", "Received", "Inline"]}
-            defaultValue={"Pending"}
             sx={{ height: "5rem" }}
+            defaultValue={state.status}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="status"
                 variant="standard"
                 {...register("status")}
-                value={"Pending"}
               />
             )}
           />
 
-          <Box>
+          <Box sx={{ display: state.createForm }}>
             <Input
               accept="image/*"
               type="file"
@@ -279,14 +389,38 @@ const Samples = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubmit(onSubmit)}>
+          <Button
+            onClick={handleSubmit(handleCreate)}
+            sx={{ display: state.createForm }}
+          >
             {state.loading ? <CircularProgress size={24} /> : "Add"}
+          </Button>
+          <Button
+            onClick={handleSubmit(handleUpdate)}
+            sx={{ display: state.editForm }}
+          >
+            {state.loading ? <CircularProgress size={24} /> : "Save"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={state.openDeleteForm} onClose={handleClose}>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Confirm to delete the department
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button color="error" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} autoFocus>
+            {state.loading ? "Loading..." : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
       <Snackbar open={state.openSnackbar}>
         <Alert variant="filled" severity="success" sx={{ width: "100%" }}>
-          Sample added successfully
+          {state.successMessage}
         </Alert>
       </Snackbar>
     </Container>
