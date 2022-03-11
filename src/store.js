@@ -6,6 +6,10 @@ import getAllSamplesReducer from "./features/samples/getAllSamples";
 import addNewSampleReducer from "./features/samples/addNewSample";
 import deleteSampleReducer from "./features/samples/deleteSample";
 import updateSampleReducer from "./features/samples/updateSample";
+import getAllOrdersReducer from "./features/order/getAllOrders";
+import addNewOrderReducer from "./features/order/addNewOrder";
+import deleteOrderReducer from "./features/order/deleteOrder";
+import updateOrderReducer from "./features/order/updateOrder";
 
 const reducer = {
   login: loginReducer,
@@ -13,6 +17,10 @@ const reducer = {
   addNewSample: addNewSampleReducer,
   deleteSample: deleteSampleReducer,
   updateSample: updateSampleReducer,
+  getAllOrders: getAllOrdersReducer,
+  addNewOrder: addNewOrderReducer,
+  deleteOrder: deleteOrderReducer,
+  updateOrder: updateOrderReducer,
 };
 
 const middleware = [];

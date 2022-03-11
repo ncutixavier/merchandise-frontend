@@ -42,6 +42,14 @@ export const ColorButton = styled(Button)(({ theme }) => ({
   color: "white",
 }));
 
+ export const TopHeader = styled(Box)({
+   display: "flex",
+   alignItems: "center",
+   justifyContent: "space-between",
+   backgroundColor: "#fff",
+   padding: "1rem",
+ });
+
 const Samples = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -212,14 +220,6 @@ const Samples = () => {
     boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
   }));
 
-  const TopHeader = styled(Box)({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    padding: "1rem",
-  });
-
   const StatusText = styled(Typography)(({ theme }) => ({
     color: "white",
     backgroundColor: theme.palette.dark.main,
@@ -314,8 +314,8 @@ const Samples = () => {
   }
 
   return (
-    <Container sx={{ flexGrow: 1, mt: 3 }}>
-      <TopHeader sx={{ my: 3 }}>
+    <Container sx={{ flexGrow: 1, py: 2 }}>
+      <TopHeader>
         <Typography variant="h5" component="div">
           Samples
         </Typography>
@@ -406,7 +406,7 @@ const Samples = () => {
       <Dialog open={state.openDeleteForm} onClose={handleClose}>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete the department
+            Confirm to delete a sample
           </DialogContentText>
         </DialogContent>
         <DialogActions>
