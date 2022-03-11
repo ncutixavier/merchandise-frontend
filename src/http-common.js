@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const http = axios.create({
-  baseURL: "https://nx-leave-app.herokuapp.com/api/v1",
+  baseURL: "https://nx-merchandise.herokuapp.com/api/v1",
 });
 
 const requestHandler = (request) => {

@@ -1,24 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import http from "../http-common";
+import http from "../../http-common";
 
-export const login = createAsyncThunk(
-  "user/login",
-  async (data, { rejectWithValue }) => {
+export const getAllSamples = createAsyncThunk(
+  "samples/fetchAll",
+  async () => {
     try {
-      const response = await http.post("/users/login", data);
-      localStorage.setItem("token", response.data.token);
+      const response = await http.get("/samples");
       return response;
     } catch (err) {
       if (!err.response) {
         throw err;
       }
-      return rejectWithValue(err.response);
+      Promise.reject(err.response);
     }
   }
 );
 
-export const loginSlice = createSlice({
-  name: "login",
+export const samplesSlice = createSlice({
+  name: "getAllSamples",
   initialState: {
     loading: false,
     error: null,
@@ -26,17 +25,17 @@ export const loginSlice = createSlice({
   },
   reducers: {},
   extraReducers: {
-    [login.pending]: (state, action) => {
+    [getAllSamples.pending]: (state, action) => {
       state.loading = true;
       state.error = null;
       state.data = [];
     },
-    [login.fulfilled]: (state, action) => {
+    [getAllSamples.fulfilled]: (state, action) => {
       state.loading = false;
       state.error = null;
       state.data = action.payload;
     },
-    [login.rejected]: (state, action) => {
+    [getAllSamples.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload;
       state.data = [];
@@ -44,5 +43,5 @@ export const loginSlice = createSlice({
   },
 });
 
-export const selectLogin = (state) => state.login;
-export default loginSlice.reducer;
+export const selectGetAllSamples = (state) => state.getAllSamples;
+export default samplesSlice.reducer;

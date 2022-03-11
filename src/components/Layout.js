@@ -15,6 +15,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import FolderIcon from "@mui/icons-material/Folder";
 import { useTheme } from "@mui/material/styles";
+import {LogoLink} from "./FrontPage";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -112,7 +113,7 @@ export default function Layout() {
             component="div"
             sx={{ flexGrow: 1 }}
           >
-            Merchandise
+            <LogoLink to="/">Merchandise</LogoLink>
           </Typography>
           {localStorage.getItem("token") ? (
             <Button
