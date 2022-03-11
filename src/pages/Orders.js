@@ -39,6 +39,7 @@ import { getAllOrders } from "../features/order/getAllOrders";
 import { addNewOrder } from "../features/order/addNewOrder";
 import { deleteOrder } from "../features/order/deleteOrder";
 import { updateOrder } from "../features/order/updateOrder";
+import { useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -64,6 +65,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 const Orders = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const validationSchema = Yup.object().shape({
@@ -224,6 +226,10 @@ const Orders = () => {
     });
   };
 
+  const handleNavigate = (data) => { 
+    navigate(`/merchandise/orders/${data._id}`);
+  }
+
   useEffect(() => {
     dispatch(getAllOrders());
   }, [dispatch]);
@@ -271,7 +277,7 @@ const Orders = () => {
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton color="dark">
+                  <IconButton color="dark" onClick={() => handleNavigate(row)}>
                     <FolderIcon />
                   </IconButton>
                 </StyledTableCell>
@@ -302,7 +308,7 @@ const Orders = () => {
 
   return (
     <Container sx={{ flexGrow: 1, py: 2 }}>
-      <TopHeader sx={{ mb: 2 }}>
+      <TopHeader sx={{ mb: 2, zoom: { xs: 0.75, md: 1 } }}>
         <Typography variant="h5" component="div">
           Orders
         </Typography>

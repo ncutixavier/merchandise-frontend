@@ -46,11 +46,6 @@ export default function Layout() {
       path: "/merchandise/orders",
       icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
     },
-    {
-      text: "Production",
-      path: "/merchandise/production",
-      icon: <FolderIcon style={{ color: theme.palette.primary.main }} />,
-    },
   ];
 
   const list = () => (
