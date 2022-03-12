@@ -10,6 +10,13 @@ import getAllOrdersReducer from "./features/order/getAllOrders";
 import addNewOrderReducer from "./features/order/addNewOrder";
 import deleteOrderReducer from "./features/order/deleteOrder";
 import updateOrderReducer from "./features/order/updateOrder";
+import getAllProductionReducer from "./features/production/getAllProduction";
+import addNewProductionReducer from "./features/production/addNewProduction";
+import deleteProductionReducer from "./features/production/deleteProduction";
+import updateProductionReducer from "./features/production/updateProduction";
+import getAllPurchaseOrder from "./features/purchaseOrder/getAllPurchaseOrder";
+import addNewPurchaseOrder from "./features/purchaseOrder/addNewPurchaseOrder";
+import deletePurchaseOrder from "./features/purchaseOrder/deletePurchaseOrder";
 
 const reducer = {
   login: loginReducer,
@@ -21,6 +28,13 @@ const reducer = {
   addNewOrder: addNewOrderReducer,
   deleteOrder: deleteOrderReducer,
   updateOrder: updateOrderReducer,
+  getAllProduction: getAllProductionReducer,
+  addNewProduction: addNewProductionReducer,
+  deleteProduction: deleteProductionReducer,
+  updateProduction: updateProductionReducer,
+  getAllPurchaseOrder: getAllPurchaseOrder,
+  addNewPurchaseOrder: addNewPurchaseOrder,
+  deletePurchaseOrder: deletePurchaseOrder,
 };
 
 const middleware = [];

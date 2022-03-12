@@ -37,7 +37,7 @@ const Charts = () => {
     ],
     datasets: [
       {
-        label: "Total Leave Requests",
+        label: "Orders per Month",
         data: Array.from({ length: 12 }, (v, i) => rand()),
         backgroundColor: theme.palette.primary.main,
       },

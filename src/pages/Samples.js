@@ -315,7 +315,7 @@ const Samples = () => {
 
   return (
     <Container sx={{ flexGrow: 1, py: 2 }}>
-      <TopHeader>
+      <TopHeader sx={{ mb: 2 }}>
         <Typography variant="h5" component="div">
           Samples
         </Typography>

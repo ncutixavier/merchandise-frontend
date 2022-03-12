@@ -7,7 +7,6 @@ import Admin from "../pages/Admin";
 import Home from "../pages/Home";
 import Orders from "../pages/Orders";
 import Samples from "../pages/Samples";
-import Production from "../pages/Production";
 import OrderDetails from "../pages/OrderDetails";
 
 const theme = createTheme({
@@ -49,8 +48,7 @@ const Index = () => {
             <Route exact path="" element={<Admin />} />
             <Route exact path="Samples" element={<Samples />} />
             <Route exact path="Orders" element={<Orders />} />
-            <Route exact path="Production" element={<Production />} />
-            <Route exact path="Orders/:id" element={<OrderDetails />} />
+            <Route exact path="Orders/purchase_order" element={<OrderDetails />} />
           </Route>
         </Routes>
       </Router>

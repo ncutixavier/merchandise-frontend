@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
-  Container,
   Box,
   Typography,
   Button,
@@ -33,21 +32,11 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Snackbar from "@mui/material/Snackbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import AddIcon from "@mui/icons-material/Add";
-import FolderIcon from "@mui/icons-material/Folder";
-import { ColorButton, TopHeader } from "./Samples";
-import { getAllOrders } from "../features/order/getAllOrders";
-import { addNewOrder } from "../features/order/addNewOrder";
-import { deleteOrder } from "../features/order/deleteOrder";
-import { updateOrder } from "../features/order/updateOrder";
-import Slide from "@mui/material/Slide";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import CloseIcon from "@mui/icons-material/Close";
-import PurchaseOrder from "../components/PurchaseOrder";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import { ColorButton, TopHeader } from "../pages/Samples";
+import { getAllProduction } from "../features/production/getAllProduction";
+import { addNewProduction } from "../features/production/addNewProduction";
+import { deleteProduction } from "../features/production/deleteProduction";
+import { updateProduction } from "../features/production/updateProduction";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -70,15 +59,16 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const Orders = () => {
+const Production = (props) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const validationSchema = Yup.object().shape({
-    buyer: Yup.string().required("Buyer is required"),
-    quantity: Yup.string().required("Quantity is required"),
-    colors: Yup.string().required("Color(s) is required"),
+    input: Yup.string().required("Input is required"),
+    output: Yup.string().required("Output is required"),
+    packed: Yup.string().required("Packed is required"),
+    style: Yup.string().required("Style is required"),
   });
 
   const {
@@ -100,12 +90,10 @@ const Orders = () => {
     successMessage: "",
     createForm: "none",
     editForm: "none",
-    sampleId: "",
+    productionId: "",
     openDeleteForm: false,
     status: "Pending",
     failedMessage: "",
-    openFolderDialog: false,
-    orderId: "",
   });
 
   const handleOpenAddForm = () => {
@@ -114,7 +102,7 @@ const Orders = () => {
       createForm: "block",
       editForm: "none",
       open: true,
-      formTitle: "Add New Order",
+      formTitle: "Add New Production",
     });
   };
 
@@ -122,7 +110,7 @@ const Orders = () => {
     setState({
       ...state,
       openDeleteForm: true,
-      sampleId: data._id,
+      productionId: data._id,
     });
   };
 
@@ -132,92 +120,91 @@ const Orders = () => {
       createForm: "none",
       editForm: "block",
       open: true,
-      formTitle: "Edit Order",
-      sampleId: data._id,
+      formTitle: "Edit Production",
+      productionId: data._id,
     });
-    setValue("buyer", data.buyer);
-    setValue("quantity", data.quantity);
-    setValue("colors", data.colors);
-  };
-
-  const handleOpenFolderDialog = (data) => {
-    setState({
-      ...state,
-      openFolderDialog: true,
-      orderId: data._id,
-    });
+    setValue("input", data.input);
+    setValue("output", data.output);
+    setValue("packed", data.packed);
+    setValue("style", data.style);
   };
 
   const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-      openDeleteForm: false,
-      openFolderDialog: false,
-    });
-    resetField("buyer");
-    resetField("quantity");
-    resetField("colors");
+    setState({ ...state, open: false, openDeleteForm: false });
+    resetField("input");
+    resetField("output");
+    resetField("packed");
+    resetField("style");
   };
 
   const handleCreate = (data) => {
     setState({ ...state, loading: true });
-    const order = {
-      buyer: data.buyer,
-      quantity: data.quantity,
-      colors: data.colors.split(","),
+    console.log(data);
+    const payload = {
+      ...data,
+      po: props.po,
     };
-    dispatch(addNewOrder(order)).then((res) => {
-      if (res.payload.status === 201) {
-        setState({
-          ...state,
-          successMessage: "Order has been added successfully",
-          openSnackbar: true,
-          open: false,
-          createForm: "none",
-          loading: false,
-        });
-        dispatch(getAllOrders());
-        resetField("buyer");
-        resetField("quantity");
-        resetField("colors");
-      } else {
-        setState({
-          ...state,
-          loading: false,
-          failedMessage: res.payload.data.message,
-          openSnackbar: true,
-        });
-      }
 
-      setTimeout(() => {
-        setState({ ...state, openSnackbar: false, open: false });
-      }, 3000);
-    });
+    dispatch(addNewProduction(payload))
+      .then((res) => {
+        console.log(res);
+        if (res.payload.status === 201) {
+          setState({
+            ...state,
+            loading: false,
+            successMessage: "Order added successfully",
+            openSnackbar: true,
+            open: false,
+          });
+          resetField("input");
+          resetField("output");
+          resetField("packed");
+          resetField("style");
+          dispatch(getAllProduction());
+        } else {
+          setState({
+            ...state,
+            loading: false,
+            failedMessage: res.payload.data.message,
+            openSnackbar: true,
+          });
+        }
+        setTimeout(() => {
+          setState({ ...state, openSnackbar: false, open: false });
+        }, 3000);
+      })
+      .catch((err) => {
+        setState({
+          ...state,
+          loading: false,
+          failedMessage: err.payload.data.message,
+          openSnackbar: true,
+        });
+      });
   };
 
   const handleUpdate = (data) => {
     setState({ ...state, loading: true });
-    const order = {
-      buyer: data.buyer,
-      quantity: data.quantity,
-      colors: data.colors.split(","),
-      id: state.sampleId,
+    const payload = {
+      ...data,
+      id: state.productionId,
     };
-    dispatch(updateOrder(order)).then((res) => {
+
+    dispatch(updateProduction(payload)).then((res) => {
+      console.log(res);
       if (res.payload.status === 200) {
         setState({
           ...state,
-          successMessage: "Order has been updated successfully",
+          loading: false,
+          successMessage: "Order updated successfully",
           openSnackbar: true,
           open: false,
-          editForm: "none",
-          loading: false,
         });
-        dispatch(getAllOrders());
-        resetField("buyer");
-        resetField("quantity");
-        resetField("colors");
+        resetField("input");
+        resetField("output");
+        resetField("packed");
+        resetField("style");
+        dispatch(getAllProduction());
       } else {
         setState({
           ...state,
@@ -226,7 +213,6 @@ const Orders = () => {
           openSnackbar: true,
         });
       }
-
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, open: false });
       }, 3000);
@@ -235,16 +221,24 @@ const Orders = () => {
 
   const handleDelete = () => {
     setState({ ...state, loading: true });
-    dispatch(deleteOrder(state.sampleId)).then((res) => {
-      setState({
-        ...state,
-        openDeleteForm: false,
-        successMessage: "Order has been deleted successfully",
-        openSnackbar: true,
-        loading: false,
-      });
-      dispatch(getAllOrders());
-
+    dispatch(deleteProduction(state.productionId)).then((res) => {
+      if (res.payload.status === 200) {
+        setState({
+          ...state,
+          successMessage: "Order has been deleted successfully",
+          openSnackbar: true,
+          openDeleteForm: false,
+          loading: false,
+        });
+        dispatch(getAllProduction());
+      } else {
+        setState({
+          ...state,
+          loading: false,
+          failedMessage: res.payload.data.message,
+          openSnackbar: true,
+        });
+      }
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, openDeleteForm: false });
       }, 3000);
@@ -252,28 +246,36 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    dispatch(getAllOrders());
+    dispatch(getAllProduction());
   }, [dispatch]);
 
-  const orders = useSelector((state) => state.getAllOrders);
+  const production = useSelector((state) => state.getAllProduction);
 
   const displayData = (rows) => {
     const search = watch("search");
     let filteredData = rows?.data;
     if (search) {
       filteredData = rows?.data?.filter((row) => {
-        return (
-          row.buyer.toLowerCase().includes(search.toLowerCase()) ||
-          row.quantity.toLowerCase().includes(search.toLowerCase())
-        );
+        return row.purchaseOrder.order.buyer
+          .toLowerCase()
+          .includes(search.toLowerCase());
       });
     }
     return (
       <TableContainer component={Paper} elevation={0}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
+        <Table sx={{ minWidth: 850 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
-              {["Buyer", "Quantity", "Colors", ""].map((cell, index) => (
+              {[
+                "Buyer",
+                "Qty",
+                "Colors",
+                "Input",
+                "Output",
+                "Packed",
+                "Style",
+                "",
+              ].map((cell, index) => (
                 <StyledTableCell key={index}>{cell}</StyledTableCell>
               ))}
             </TableRow>
@@ -282,9 +284,19 @@ const Orders = () => {
           <TableBody>
             {(filteredData || []).map((row) => (
               <StyledTableRow key={row._id}>
-                <StyledTableCell>{row.buyer}</StyledTableCell>
-                <StyledTableCell>{row.quantity}</StyledTableCell>
-                <StyledTableCell>{row.colors.join(",")}</StyledTableCell>
+                <StyledTableCell>
+                  {row.purchaseOrder.order.buyer}
+                </StyledTableCell>
+                <StyledTableCell>
+                  {row.purchaseOrder.order.quantity}
+                </StyledTableCell>
+                <StyledTableCell>
+                  {row.purchaseOrder.order.colors.join(",")}
+                </StyledTableCell>
+                <StyledTableCell>{row.style}</StyledTableCell>
+                <StyledTableCell>{row.input}</StyledTableCell>
+                <StyledTableCell>{row.output}</StyledTableCell>
+                <StyledTableCell>{row.packed}</StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="error"
@@ -298,12 +310,6 @@ const Orders = () => {
                   >
                     <EditIcon />
                   </IconButton>
-                  <IconButton
-                    color="dark"
-                    onClick={() => handleOpenFolderDialog(row)}
-                  >
-                    <FolderIcon />
-                  </IconButton>
                 </StyledTableCell>
               </StyledTableRow>
             ))}
@@ -314,27 +320,27 @@ const Orders = () => {
   };
 
   let content;
-  if (orders.loading) {
+  if (production.loading) {
     content = (
       <Box sx={{ position: "absolute", left: "47.3%", top: "45%" }}>
         <CircularProgress size={60} />
       </Box>
     );
-  } else if (orders.error) {
+  } else if (production.error) {
     content = (
       <Alert severity="error">
         Error occured while fetching data. Please try again later.
       </Alert>
     );
-  } else if (orders.data) {
-    content = displayData(orders?.data?.data);
+  } else if (production.data) {
+    content = displayData(production?.data?.data);
   }
 
   return (
-    <Container sx={{ flexGrow: 1, py: 2 }}>
-      <TopHeader sx={{ mb: 2, zoom: { xs: 0.75, md: 1 } }}>
+    <Box sx={{ flexGrow: 1 }}>
+      <TopHeader sx={{ mb: 2, zoom: { xs: 0.7, md: 1 } }}>
         <Typography variant="h6" component="div">
-          Orders
+          Production
         </Typography>
         <Paper
           variant="outlined"
@@ -342,7 +348,7 @@ const Orders = () => {
             p: "2px 4px",
             display: "flex",
             alignItems: "center",
-            width: 230,
+            width: 200,
             height: "35px",
           }}
         >
@@ -375,39 +381,52 @@ const Orders = () => {
             autoFocus
             margin="dense"
             id="name"
-            label="Buyer"
+            label="Input"
             fullWidth
             sx={{ height: "4rem" }}
             variant="standard"
-            {...register("buyer")}
-            error={errors.buyer ? true : false}
-            helperText={errors.buyer ? errors.buyer.message : ""}
+            {...register("input")}
+            error={errors.input ? true : false}
+            helperText={errors.input ? errors.input.message : ""}
           />
 
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            label="Quantity"
+            label="Output"
             fullWidth
             sx={{ height: "4rem" }}
             variant="standard"
-            {...register("quantity")}
-            error={errors.quantity ? true : false}
-            helperText={errors.quantity ? errors.quantity.message : ""}
+            {...register("output")}
+            error={errors.output ? true : false}
+            helperText={errors.output ? errors.output.message : ""}
           />
 
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            label="Colors"
+            label="Style"
             fullWidth
             sx={{ height: "4rem" }}
             variant="standard"
-            {...register("colors")}
-            error={errors.colors ? true : false}
-            helperText={errors.colors ? errors.colors.message : ""}
+            {...register("style")}
+            error={errors.style ? true : false}
+            helperText={errors.style ? errors.style.message : ""}
+          />
+
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Packed"
+            fullWidth
+            sx={{ height: "4rem" }}
+            variant="standard"
+            {...register("packed")}
+            error={errors.packed ? true : false}
+            helperText={errors.packed ? errors.packed.message : ""}
           />
         </DialogContent>
         <DialogActions>
@@ -429,7 +448,7 @@ const Orders = () => {
       <Dialog open={state.openDeleteForm} onClose={handleClose}>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete order
+            Confirm to delete production data
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -452,33 +471,8 @@ const Orders = () => {
           </Alert>
         )}
       </Snackbar>
-      <Dialog
-        fullScreen
-        open={state.openFolderDialog}
-        onClose={handleClose}
-        TransitionComponent={Transition}
-      >
-        <AppBar sx={{ position: "relative", color: "white" }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handleClose}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography
-              sx={{ ml: 2, flex: 1 }}
-              variant="h6"
-              component="div"
-            > Purchase Order</Typography>
-          </Toolbar>
-        </AppBar>
-        <PurchaseOrder id={state.orderId} />
-      </Dialog>
-    </Container>
+    </Box>
   );
 };
 
-export default Orders;
+export default Production;

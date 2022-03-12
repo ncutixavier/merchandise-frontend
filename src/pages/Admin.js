@@ -85,7 +85,7 @@ export default function Admin() {
         <Grid item xs={12} sm={12} md={12}>
           <Paper elevation={0} variant="outlined" sx={{ padding: 1 }}>
             <Typography variant="h6" sx={{ textAlign: "center" }}>
-              Total Leaves per month
+              Total Orders per month
             </Typography>
             <Charts />
           </Paper>
