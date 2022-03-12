@@ -1,15 +1,19 @@
 import React, { useEffect } from "react";
+import { useTheme } from "@mui/material/styles";
 import {
-  Container,
   Box,
+  Typography,
   Button,
   CircularProgress,
   Alert,
+  Container,
+  Input,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -18,20 +22,18 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Paper, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import DialogContentText from "@mui/material/DialogContentText";
 import Snackbar from "@mui/material/Snackbar";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import AddIcon from "@mui/icons-material/Add";
-import FolderIcon from "@mui/icons-material/Folder";
 import { ColorButton, TopHeader } from "../pages/Samples";
-import { useNavigate } from "react-router-dom";
-import { getAllPurchaseOrder } from "../features/purchaseOrder/getAllPurchaseOrder";
-import { addNewPurchaseOrder } from "../features/purchaseOrder/addNewPurchaseOrder";
-import { deletePurchaseOrder } from "../features/purchaseOrder/deletePurchaseOrder";
+import { getAllStyles } from "../features/style/getAllStyles";
+import { addNewStyle } from "../features/style/addNewStyle";
+import { deleteStyle } from "../features/style/deleteStyle";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -54,15 +56,24 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const PurchaseOrder = (props) => {
+const Style = (props) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const validationSchema = Yup.object().shape({
+    image: Yup.mixed().test("required", "Image is required", (value) => {
+      return value && value.length > 0;
+    }),
+  });
 
   const {
     register,
+    handleSubmit,
     watch,
+    formState: { errors },
   } = useForm({
-    resolver: yupResolver(),
+    resolver: yupResolver(validationSchema),
   });
 
   const [state, setState] = React.useState({
@@ -73,18 +84,28 @@ const PurchaseOrder = (props) => {
     successMessage: "",
     createForm: "none",
     editForm: "none",
-    sampleId: "",
-    purchaseOrderId: "",
+    productionId: "",
+    styleId: "",
     openDeleteForm: false,
     status: "Pending",
     failedMessage: "",
   });
 
+  const handleOpenAddForm = () => {
+    setState({
+      ...state,
+      createForm: "block",
+      editForm: "none",
+      open: true,
+      formTitle: "Add New Production",
+    });
+  };
+
   const handleOpenDeleteDialog = (data) => {
     setState({
       ...state,
       openDeleteForm: true,
-      purchaseOrderId: data._id,
+      styleId: data._id,
     });
   };
 
@@ -92,41 +113,62 @@ const PurchaseOrder = (props) => {
     setState({ ...state, open: false, openDeleteForm: false });
   };
 
-  const handleCreate = () => {
+  const handleCreate = (data) => {
     setState({ ...state, loading: true });
-    dispatch(addNewPurchaseOrder(props.id)).then((res) => {
-      if (res.payload.status === 201) {
+    const style = new FormData();
+    style.append("image", data.image[0]);
+    style.append("purchaseOrder", props.po_number);
+
+    dispatch(addNewStyle(style))
+      .then((response) => {
+        if (response.payload.status === 201) {
+          setState({
+            ...state,
+            loading: false,
+            open: false,
+            openSnackbar: true,
+            successMessage: "Style added successfully",
+          });
+          dispatch(getAllStyles(props.po_number));
+        } else {
+          setState({
+            ...state,
+            loading: false,
+            open: false,
+            openSnackbar: true,
+            failedMessage: response.payload.data.message,
+          });
+        }
+        setTimeout(() => {
+          setState({ ...state, openSnackbar: false, open: false });
+        }, 3000);
+      })
+      .catch((error) => {
         setState({
           ...state,
-          openSnackbar: true,
-          successMessage: "Purchase Order added successfully",
           loading: false,
+          open: false,
+          openSnackbar: true,
+          failedMessage: error.payload.data.message,
         });
-        dispatch(getAllPurchaseOrder(props.id));
-      }
-
-      setTimeout(() => {
-        setState({ ...state, openSnackbar: false, loading: false });
-      }, 2000);
-    });
+        setTimeout(() => {
+          setState({ ...state, openSnackbar: false, open: false });
+        }, 3000);
+      });
   };
 
   const handleDelete = () => {
     setState({ ...state, loading: true });
-    const data = {
-      id: props.id,
-      purchaseOrderId: state.purchaseOrderId,
-    };
-    dispatch(deletePurchaseOrder(data)).then((res) => {
+    dispatch(deleteStyle(state.styleId)).then((res) => {
       if (res.payload.status === 200) {
         setState({
           ...state,
+          successMessage: "Style has been deleted successfully",
           openSnackbar: true,
-          successMessage: "Purchase Order deleted successfully",
           openDeleteForm: false,
           loading: false,
         });
-        dispatch(getAllPurchaseOrder(props.id));
+        dispatch(getAllStyles(props.po_number));
       } else {
         setState({
           ...state,
@@ -135,68 +177,60 @@ const PurchaseOrder = (props) => {
           openSnackbar: true,
         });
       }
-
       setTimeout(() => {
-        setState({
-          ...state,
-          openSnackbar: false,
-          loading: false,
-          openDeleteForm: false,
-        });
+        setState({ ...state, openSnackbar: false, openDeleteForm: false });
       }, 3000);
     });
   };
 
-  const handleNavigate = (data) => {
-    navigate(`/merchandise/orders/purchase_order?po=${data.po_number}`);
-  };
-
   useEffect(() => {
-    dispatch(getAllPurchaseOrder(props.id));
-  }, [dispatch, props.id]);
+    dispatch(getAllStyles(props.po_number));
+  }, [dispatch, props]);
 
-  const purchaseOrder = useSelector((state) => state.getAllPurchaseOrder);
+  const styles = useSelector((state) => state.getAllStyles);
 
   const displayData = (rows) => {
     const search = watch("search");
     let filteredData = rows?.data;
     if (search) {
       filteredData = rows?.data?.filter((row) => {
-        return (
-          row.order.buyer.toLowerCase().includes(search.toLowerCase()) ||
-          row.po_number.toLowerCase().includes(search.toLowerCase())
-        );
+        return row.purchaseOrder.order.buyer
+          .toLowerCase()
+          .includes(search.toLowerCase());
       });
     }
     return (
       <TableContainer component={Paper} elevation={0}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
+        <Table sx={{ minWidth: 450 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
-              {["PO Number", "Buyer", "Order Qty", "Colors", ""].map(
-                (cell, index) => (
-                  <StyledTableCell key={index}>{cell}</StyledTableCell>
-                )
-              )}
+              {["PO Number", "Buyer", "Style", ""].map((cell, index) => (
+                <StyledTableCell key={index}>{cell}</StyledTableCell>
+              ))}
             </TableRow>
           </TableHead>
 
           <TableBody>
             {(filteredData || []).map((row) => (
               <StyledTableRow key={row._id}>
-                <StyledTableCell>{row.po_number}</StyledTableCell>
-                <StyledTableCell>{row.order.buyer}</StyledTableCell>
-                <StyledTableCell>{row.order.quantity}</StyledTableCell>
-                <StyledTableCell>{row.order.colors.join(",")}</StyledTableCell>
+                <StyledTableCell>{row.purchaseOrder.po_number}</StyledTableCell>
+                <StyledTableCell>
+                  {row.purchaseOrder.order.buyer}
+                </StyledTableCell>
+                <StyledTableCell>
+                  <a
+                    href={row.image}
+                    style={{ color: theme.palette.primary.main }}
+                  >
+                    Download
+                  </a>
+                </StyledTableCell>
                 <StyledTableCell align="center">
                   <IconButton
                     color="error"
                     onClick={() => handleOpenDeleteDialog(row)}
                   >
                     <DeleteIcon />
-                  </IconButton>
-                  <IconButton color="dark" onClick={() => handleNavigate(row)}>
-                    <FolderIcon />
                   </IconButton>
                 </StyledTableCell>
               </StyledTableRow>
@@ -208,65 +242,79 @@ const PurchaseOrder = (props) => {
   };
 
   let content;
-  if (purchaseOrder.loading) {
+  if (styles.loading) {
     content = (
       <Box sx={{ position: "absolute", left: "47.3%", top: "45%" }}>
         <CircularProgress size={60} />
       </Box>
     );
-  } else if (purchaseOrder.error) {
+  } else if (styles.error) {
     content = (
       <Alert severity="error">
         Error occured while fetching data. Please try again later.
       </Alert>
     );
-  } else if (purchaseOrder.data) {
-    content = displayData(purchaseOrder?.data?.data);
+  } else if (styles.data) {
+    content = displayData(styles?.data?.data);
   }
 
   return (
     <Container sx={{ flexGrow: 1 }}>
-      <TopHeader sx={{ mb: 2, px: 0 }}>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: "2px 4px",
-            display: "flex",
-            alignItems: "center",
-            width: 200,
-            height: "35px",
-          }}
-        >
-          <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Search"
-            inputProps={{ "aria-label": "search" }}
-            {...register("search")}
-          />
-          <IconButton sx={{ p: "10px" }} aria-label="search" disabled>
-            <SearchIcon />
-          </IconButton>
-        </Paper>
+      <TopHeader sx={{ mb: 2 }}>
+        <Typography variant="h6" component="div">
+          Styles
+        </Typography>
+
         <ColorButton
           variant="contained"
-          startIcon={
-            state.loading ? (
-              <CircularProgress size={15} style={{ color: "white" }} />
-            ) : (
-              <AddIcon />
-            )
-          }
-          onClick={handleCreate}
+          startIcon={<AddIcon />}
+          onClick={handleOpenAddForm}
         >
-          {state.loading ? "Adding..." : "Create"}
+          Add
         </ColorButton>
       </TopHeader>
       {content}
 
+      <Dialog open={state.open} onClose={handleClose} fullScreen={fullScreen}>
+        <DialogTitle sx={{ backgroundColor: theme.palette.secondary.main }}>
+          Add New Style
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ height: "60px" }}>
+            <Input
+              accept="image/*"
+              type="file"
+              fullWidth
+              sx={{ mt: 2 }}
+              {...register("image")}
+              error={errors.image ? true : false}
+              helperText={errors.image ? errors.image.message : ""}
+            />
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: "0.8rem",
+                color: theme.palette.error.main,
+              }}
+            >
+              {errors.image ? errors.image.message : ""}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button
+            onClick={handleSubmit(handleCreate)}
+            sx={{ display: state.createForm }}
+          >
+            {state.loading ? <CircularProgress size={24} /> : "Add"}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={state.openDeleteForm} onClose={handleClose}>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Confirm to delete purchase order
+            Confirm to remove style data
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -274,7 +322,7 @@ const PurchaseOrder = (props) => {
             Cancel
           </Button>
           <Button onClick={handleDelete} autoFocus>
-            {state.loading ? "Loading..." : "Delete"}
+            {state.loading ? "Deleting..." : "Delete"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -293,4 +341,4 @@ const PurchaseOrder = (props) => {
   );
 };
 
-export default PurchaseOrder;
+export default Style;

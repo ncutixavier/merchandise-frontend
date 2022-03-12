@@ -6,12 +6,12 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import { useLocation } from "react-router-dom";
 import Production from "../components/Production";
+import Style from "../components/Style";
 
 export default function OrderDetails() {
   const [value, setValue] = React.useState("1");
   const useQuery = () => new URLSearchParams(useLocation().search);
   let query = useQuery();
-  console.log(query.get('po'))
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -42,7 +42,9 @@ export default function OrderDetails() {
         <TabPanel value="1">
           <Production po={query.get("po")} />
         </TabPanel>
-        <TabPanel value="2">Style</TabPanel>
+        <TabPanel value="2">
+          <Style po_number={query.get("po")} />
+        </TabPanel>
       </TabContext>
     </Box>
   );

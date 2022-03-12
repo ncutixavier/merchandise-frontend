@@ -17,6 +17,9 @@ import updateProductionReducer from "./features/production/updateProduction";
 import getAllPurchaseOrder from "./features/purchaseOrder/getAllPurchaseOrder";
 import addNewPurchaseOrder from "./features/purchaseOrder/addNewPurchaseOrder";
 import deletePurchaseOrder from "./features/purchaseOrder/deletePurchaseOrder";
+import addNewStyleReducer from "./features/style/addNewStyle";
+import getAllStylesReducer from "./features/style/getAllStyles";
+import deleteStyleReducer from "./features/style/deleteStyle";
 
 const reducer = {
   login: loginReducer,
@@ -35,6 +38,9 @@ const reducer = {
   getAllPurchaseOrder: getAllPurchaseOrder,
   addNewPurchaseOrder: addNewPurchaseOrder,
   deletePurchaseOrder: deletePurchaseOrder,
+  addNewStyle: addNewStyleReducer,
+  getAllStyles: getAllStylesReducer,
+  deleteStyle: deleteStyleReducer,
 };
 
 const middleware = [];

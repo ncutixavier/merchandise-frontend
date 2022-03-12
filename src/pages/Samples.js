@@ -95,7 +95,6 @@ const Samples = () => {
 
     dispatch(addNewSample(sample))
       .then((res) => {
-        console.log(res);
         setState({
           ...state,
           open: false,
@@ -115,15 +114,11 @@ const Samples = () => {
         }, 3000);
         dispatch(getAllSamples());
       })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   const handleDelete = () => {
     setState({ ...state, loading: true });
     dispatch(deleteSample(state.sampleId)).then((res) => {
-      console.log(res);
       setState({
         ...state,
         openDeleteForm: false,
@@ -143,7 +138,6 @@ const Samples = () => {
   };
 
   const handleUpdate = (data) => {
-    console.log(data);
     const sample = {
       style_no: data.style_no,
       id: state.sampleId,
@@ -151,7 +145,6 @@ const Samples = () => {
     };
     setState({ ...state, loading: true });
     dispatch(updateSample(sample)).then((res) => {
-      console.log(res);
       setState({
         ...state,
         open: false,

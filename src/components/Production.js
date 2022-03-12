@@ -139,7 +139,6 @@ const Production = (props) => {
 
   const handleCreate = (data) => {
     setState({ ...state, loading: true });
-    console.log(data);
     const payload = {
       ...data,
       po: props.po,
@@ -147,7 +146,6 @@ const Production = (props) => {
 
     dispatch(addNewProduction(payload))
       .then((res) => {
-        console.log(res);
         if (res.payload.status === 201) {
           setState({
             ...state,
@@ -191,7 +189,6 @@ const Production = (props) => {
     };
 
     dispatch(updateProduction(payload)).then((res) => {
-      console.log(res);
       if (res.payload.status === 200) {
         setState({
           ...state,
