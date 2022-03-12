@@ -210,7 +210,7 @@ const Style = (props) => {
     }
     return (
       <TableContainer component={Paper} elevation={0}>
-        <Table sx={{ minWidth: 450 }} size="small" aria-label="simple table">
+        <Table sx={{ minWidth: 550 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
               {["PO Number", "Buyer", "Created At", "Style", ""].map((cell, index) => (
