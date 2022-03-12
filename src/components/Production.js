@@ -169,7 +169,7 @@ const Production = (props) => {
         }
         setTimeout(() => {
           setState({ ...state, openSnackbar: false, open: false });
-        }, 3000);
+        }, 1000);
       })
       .catch((err) => {
         setState({
@@ -212,7 +212,7 @@ const Production = (props) => {
       }
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, open: false });
-      }, 3000);
+      }, 1000);
     });
   };
 
@@ -238,7 +238,7 @@ const Production = (props) => {
       }
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, openDeleteForm: false });
-      }, 3000);
+      }, 1000);
     });
   };
 

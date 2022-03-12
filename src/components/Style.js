@@ -61,6 +61,11 @@ const Style = (props) => {
   const dispatch = useDispatch();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const styleData = {
+    po_number: props.po_number,
+    order: props.order,
+  };
+
   const validationSchema = Yup.object().shape({
     image: Yup.mixed().test("required", "Image is required", (value) => {
       return value && value.length > 0;
@@ -118,6 +123,7 @@ const Style = (props) => {
     const style = new FormData();
     style.append("image", data.image[0]);
     style.append("purchaseOrder", props.po_number);
+    style.append("order", props.order);
 
     dispatch(addNewStyle(style))
       .then((response) => {
@@ -129,7 +135,7 @@ const Style = (props) => {
             openSnackbar: true,
             successMessage: "Style added successfully",
           });
-          dispatch(getAllStyles(props.po_number));
+          dispatch(getAllStyles(styleData));
         } else {
           setState({
             ...state,
@@ -141,7 +147,7 @@ const Style = (props) => {
         }
         setTimeout(() => {
           setState({ ...state, openSnackbar: false, open: false });
-        }, 3000);
+        }, 1000);
       })
       .catch((error) => {
         setState({
@@ -153,7 +159,7 @@ const Style = (props) => {
         });
         setTimeout(() => {
           setState({ ...state, openSnackbar: false, open: false });
-        }, 3000);
+        }, 1000);
       });
   };
 
@@ -168,7 +174,7 @@ const Style = (props) => {
           openDeleteForm: false,
           loading: false,
         });
-        dispatch(getAllStyles(props.po_number));
+        dispatch(getAllStyles(styleData));
       } else {
         setState({
           ...state,
@@ -179,12 +185,15 @@ const Style = (props) => {
       }
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, openDeleteForm: false });
-      }, 3000);
+      }, 1000);
     });
   };
 
   useEffect(() => {
-    dispatch(getAllStyles(props.po_number));
+    dispatch(getAllStyles({
+      po_number: props.po_number,
+      order: props.order,
+    }));
   }, [dispatch, props]);
 
   const styles = useSelector((state) => state.getAllStyles);
@@ -204,7 +213,7 @@ const Style = (props) => {
         <Table sx={{ minWidth: 450 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
-              {["PO Number", "Buyer", "Style", ""].map((cell, index) => (
+              {["PO Number", "Buyer", "Created At", "Style", ""].map((cell, index) => (
                 <StyledTableCell key={index}>{cell}</StyledTableCell>
               ))}
             </TableRow>
@@ -214,8 +223,9 @@ const Style = (props) => {
             {(filteredData || []).map((row) => (
               <StyledTableRow key={row._id}>
                 <StyledTableCell>{row.purchaseOrder.po_number}</StyledTableCell>
+                <StyledTableCell>{row.order.buyer}</StyledTableCell>
                 <StyledTableCell>
-                  {row.purchaseOrder.order.buyer}
+                  {row.createdAt.split("T")[0]}
                 </StyledTableCell>
                 <StyledTableCell>
                   <a

@@ -192,7 +192,7 @@ const Orders = () => {
 
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, open: false });
-      }, 3000);
+      }, 1000);
     });
   };
 
@@ -229,7 +229,7 @@ const Orders = () => {
 
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, open: false });
-      }, 3000);
+      }, 1000);
     });
   };
 
@@ -247,7 +247,7 @@ const Orders = () => {
 
       setTimeout(() => {
         setState({ ...state, openSnackbar: false, openDeleteForm: false });
-      }, 3000);
+      }, 1000);
     });
   };
 

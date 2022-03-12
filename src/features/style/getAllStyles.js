@@ -3,9 +3,9 @@ import http from "../../http-common";
 
 export const getAllStyles = createAsyncThunk(
   "styles/fetchAll",
-  async (po_number) => {
+  async (data) => {
     try {
-      const response = await http.get(`/styles?po=${po_number}`);
+      const response = await http.get(`/styles?po=${data.po_number}&order=${data.order}`);
       return response;
     } catch (err) {
       if (!err.response) {

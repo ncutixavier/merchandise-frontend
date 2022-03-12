@@ -35,15 +35,15 @@ export default function OrderDetails() {
             aria-label="Order Details"
             variant="fullWidth"
           >
-            <Tab label="Production" value="1" />
-            <Tab label="Style" value="2" />
+            <Tab label="Style" value="1" />
+            <Tab label="Production" value="2" />
           </TabList>
         </Box>
         <TabPanel value="1">
-          <Production po={query.get("po")} />
+          <Style po_number={query.get("po")} order={query.get("order")} />
         </TabPanel>
         <TabPanel value="2">
-          <Style po_number={query.get("po")} />
+          <Production po={query.get("po")} />
         </TabPanel>
       </TabContext>
     </Box>

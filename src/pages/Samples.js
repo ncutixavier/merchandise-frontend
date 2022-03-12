@@ -111,7 +111,7 @@ const Samples = () => {
             loading: false,
             open: false,
           });
-        }, 3000);
+        }, 1000);
         dispatch(getAllSamples());
       })
   };
@@ -132,7 +132,7 @@ const Samples = () => {
           openSnackbar: false,
           openDeleteForm: false,
         });
-      }, 3000);
+      }, 1000);
       dispatch(getAllSamples());
     });
   };
@@ -158,7 +158,7 @@ const Samples = () => {
           openSnackbar: false,
           open: false,
         });
-      }, 3000);
+      }, 1000);
       dispatch(getAllSamples());
     });
   };

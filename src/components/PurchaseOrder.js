@@ -143,12 +143,12 @@ const PurchaseOrder = (props) => {
           loading: false,
           openDeleteForm: false,
         });
-      }, 3000);
+      }, 1000);
     });
   };
 
   const handleNavigate = (data) => {
-    navigate(`/merchandise/orders/purchase_order?po=${data.po_number}`);
+    navigate(`/merchandise/orders/purchase_order?po=${data.po_number}&order=${props.id}`);
   };
 
   useEffect(() => {
