@@ -61,7 +61,7 @@ export default function Login() {
 
   const loginWithGoogle = useSelector((state) => state.login);
   const { loading } = loginWithGoogle;
-  
+
   return (
     <Grid
       container
@@ -71,7 +71,7 @@ export default function Login() {
       sx={{ background: theme.palette.secondary.main, minHeight: "100vh" }}
     >
       <Grid item xs={12} sm={8} md={4}>
-        <Item className={classes.loginForm} sx={{ py: 9 }} elevation={0}>
+        <Item className={classes.loginForm} sx={{ py: 9 }} variant="outlined">
           <Alert severity="error" sx={{ display: loginError.display }}>
             {loginError.message ?? "Error occured while logging in"}
           </Alert>
