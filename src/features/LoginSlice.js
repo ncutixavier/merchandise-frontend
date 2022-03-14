@@ -6,8 +6,6 @@ export const login = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await http.post("/auth/google", data);
-      // localStorage.setItem("token", response.data.token);
-      console.log("LOGIN::", response);
       return response;
     } catch (err) {
       if (!err.response) {
