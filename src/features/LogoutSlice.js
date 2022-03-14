@@ -1,25 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import http from "../http-common";
 
-export const login = createAsyncThunk(
-  "auth/login",
-  async (data, { rejectWithValue }) => {
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async () => {
     try {
-      const response = await http.post("/auth/google", data);
-      // localStorage.setItem("token", response.data.token);
-      console.log("LOGIN::", response);
+      const response = await http.post("/auth/logout");
       return response;
     } catch (err) {
       if (!err.response) {
         throw err;
       }
-      return rejectWithValue(err.response);
+      return Promise.reject(err.response);
     }
   }
 );
 
-export const loginSlice = createSlice({
-  name: "login",
+export const logoutSlice = createSlice({
+  name: "logout",
   initialState: {
     loading: false,
     error: null,
@@ -27,17 +25,17 @@ export const loginSlice = createSlice({
   },
   reducers: {},
   extraReducers: {
-    [login.pending]: (state, action) => {
+    [logout.pending]: (state, action) => {
       state.loading = true;
       state.error = null;
       state.data = [];
     },
-    [login.fulfilled]: (state, action) => {
+    [logout.fulfilled]: (state, action) => {
       state.loading = false;
       state.error = null;
       state.data = action.payload;
     },
-    [login.rejected]: (state, action) => {
+    [logout.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload;
       state.data = [];
@@ -45,5 +43,5 @@ export const loginSlice = createSlice({
   },
 });
 
-export const selectLogin = (state) => state.login;
-export default loginSlice.reducer;
+export const selectLogout = (state) => state.logout;
+export default logoutSlice.reducer;

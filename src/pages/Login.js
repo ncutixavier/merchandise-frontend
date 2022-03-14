@@ -3,18 +3,16 @@ import { useState } from "react";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import { Typography, Button, CircularProgress } from "@mui/material";
+import { Typography, CircularProgress, Box } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { makeStyles } from "@mui/styles";
-import TextField from "@mui/material/TextField";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/LoginSlice";
-import {LogoLink} from "../components/FrontPage"
+import { LogoLink } from "../components/FrontPage";
+import { GoogleLogin } from "react-google-login";
+import Cookie from "js-cookie";
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -22,13 +20,11 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const FormInput = styled("div")(({ theme }) => ({
-  height: "70px",
-}));
-
 const useStyles = makeStyles(({ spacing }) => ({
-  loginForm: {
-   
+  loginForm: {},
+  "google-login-button": {
+    width: "100%",
+    justifyContent: "center",
   },
 }));
 
@@ -37,48 +33,35 @@ export default function Login() {
   const dispatch = useDispatch();
   const classes = useStyles();
   let navigate = useNavigate();
+
   const [loginError, setLoginError] = useState({
     display: "none",
     message: "",
   });
-  const [loginSuccess, setLoginSuccess] = useState({
-    display: "none",
-    message: "",
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().required("Email is required").email("Invalid email"),
-    password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
-  });
+  const onGoogleSuccess = (response) => {
+    const tokenId = response.tokenId;
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
-  const onSubmit = async (data) => {
-    try {
-      setIsSubmitted(true);
-      const res = await dispatch(login(data)).unwrap();
-      if (res.status === 200) {
-        setIsSubmitted(false);
-        setLoginSuccess({ display: "flex", message: res.data.message });
-        setLoginError({ display: "none", message: "" });
+    dispatch(login({ tokenId })).then((res) => {
+      if (res.payload.status === 200) {
+        Cookie.set("token", tokenId);
         navigate("/merchandise");
+      } else {
+        setLoginError({
+          display: "block",
+          message: res.payload.data.message,
+        });
       }
-    } catch (err) {
-      setLoginError({ display: "flex", message: err.data.message });
-      setIsSubmitted(false);
-    }
+    });
   };
 
+  const onGoogleFailure = (error) => {
+    console.log("FAILURE::", error);
+  };
+
+  const loginWithGoogle = useSelector((state) => state.login);
+  const { loading } = loginWithGoogle;
+  
   return (
     <Grid
       container
@@ -88,65 +71,61 @@ export default function Login() {
       sx={{ background: theme.palette.secondary.main, minHeight: "100vh" }}
     >
       <Grid item xs={12} sm={8} md={4}>
-        <Typography
-          variant="h5"
-          sx={{
-            mt: 3,
-            color: "white",
-            textAlign: "center",
-            textTransform: "uppercase",
-          }}
-        >
-          <LogoLink to="/">Merchandise - Home</LogoLink>
-        </Typography>
-
-        <Item className={classes.loginForm} sx={{ py: 9 }}>
+        <Item className={classes.loginForm} sx={{ py: 9 }} elevation={0}>
           <Alert severity="error" sx={{ display: loginError.display }}>
             {loginError.message ?? "Error occured while logging in"}
           </Alert>
-          <Alert severity="success" sx={{ display: loginSuccess.display }}>
-            {loginSuccess.message ?? "Login successful"}
-          </Alert>
-          <Typography variant="h5" sx={{ my: 2, textAlign: "center" }}>
-            Log in
-          </Typography>
-          <FormInput>
-            <TextField
-              fullWidth
-              label="Email"
-              size="small"
-              name="email"
-              control={control}
-              {...register("email")}
-              error={errors.email ? true : false}
-              helperText={errors.email ? errors.email.message : null}
-            />
-          </FormInput>
-          <FormInput>
-            <TextField
-              fullWidth
-              label="Password"
-              size="small"
-              name="password"
-              type="password"
-              control={control}
-              {...register("password")}
-              error={errors.password ? true : false}
-              helperText={errors.password ? errors.password.message : null}
-            />
-          </FormInput>
-          <Button
-            color="primary"
-            variant="contained"
-            fullWidth
-            onClick={handleSubmit(onSubmit)}
+
+          <Typography
+            variant="body1"
+            sx={{
+              my: 2,
+              textAlign: "center",
+              color: theme.palette.primary.main,
+            }}
           >
-            {isSubmitted ? (
-              <CircularProgress color="inherit" size={25} />
-            ) : (
-              "Login"
+            <LogoLink to="/">Back to home</LogoLink>
+          </Typography>
+
+          <Typography
+            variant="h5"
+            sx={{
+              my: 3,
+              textAlign: "center",
+            }}
+          >
+            Welcome to Merchandise dashboard!
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              position: "relative",
+            }}
+          >
+            <GoogleLogin
+              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+              buttonText={loading ? "Signing..." : "Sign in with Google"}
+              onSuccess={onGoogleSuccess}
+              onFailure={onGoogleFailure}
+              className={classes["google-login-button"]}
+              disabled={loading}
+            />
+
+            {loading && (
+              <CircularProgress
+                color="primary"
+                size={25}
+                thickness={5}
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  right: "10px",
+                  marginTop: -12,
+                }}
+              />
             )}
-          </Button>
+          </Box>
         </Item>
       </Grid>
     </Grid>

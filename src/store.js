@@ -20,6 +20,7 @@ import deletePurchaseOrder from "./features/purchaseOrder/deletePurchaseOrder";
 import addNewStyleReducer from "./features/style/addNewStyle";
 import getAllStylesReducer from "./features/style/getAllStyles";
 import deleteStyleReducer from "./features/style/deleteStyle";
+import logoutReducer from "./features/LogoutSlice";
 
 const reducer = {
   login: loginReducer,
@@ -41,6 +42,7 @@ const reducer = {
   addNewStyle: addNewStyleReducer,
   getAllStyles: getAllStylesReducer,
   deleteStyle: deleteStyleReducer,
+  logout: logoutReducer,
 };
 
 const middleware = [];

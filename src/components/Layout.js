@@ -9,17 +9,21 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Outlet, useNavigate } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import { List } from "@mui/material";
-import Divider from "@mui/material/Divider";
+import { Divider } from "@mui/material";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import FolderIcon from "@mui/icons-material/Folder";
 import { useTheme } from "@mui/material/styles";
-import {LogoLink} from "./FrontPage";
+import { LogoLink } from "./FrontPage";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../features/LogoutSlice";
+import cookie from "js-cookie";
 
 export default function Layout() {
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = (open) => (event) => {
@@ -72,9 +76,14 @@ export default function Layout() {
   );
 
   const handlelogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+    dispatch(logout()).then((res) => {
+      cookie.remove("token");
+      navigate("/login");
+    });
   };
+
+  const logoutAction = useSelector((state) => state.logout);
+  const { loading } = logoutAction;
 
   return (
     <Box
@@ -110,7 +119,8 @@ export default function Layout() {
           >
             <LogoLink to="/">Merchandise</LogoLink>
           </Typography>
-          {localStorage.getItem("token") ? (
+
+          {cookie.get("token") ? (
             <Button
               color="inherit"
               variant="outlined"
@@ -118,13 +128,15 @@ export default function Layout() {
                 handlelogout();
               }}
             >
-              Logout
+              {loading ? "Logout..." : "Logout"}
             </Button>
           ) : (
             <Button
               color="inherit"
               variant="outlined"
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                navigate("/login");
+              }}
             >
               Login
             </Button>

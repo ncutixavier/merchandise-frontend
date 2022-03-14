@@ -1,11 +1,16 @@
 import axios from "axios";
+import cookie from "js-cookie";
 
 const http = axios.create({
   baseURL: "https://nx-merchandise.herokuapp.com/api/v1",
+  // baseURL:"http://localhost:4000/api/v1",
+  headers: {
+    Authorization: cookie.get("token"),
+  },
 });
 
 const requestHandler = (request) => {
-  request.headers.Authorization = localStorage.token;
+  request.headers.Authorization = cookie.get("token");
   return request;
 };
 
@@ -35,4 +40,4 @@ http.interceptors.response.use(
   (error) => errorHandler(error)
 );
 
-export default http
+export default http;
