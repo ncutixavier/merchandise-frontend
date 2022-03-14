@@ -39,7 +39,7 @@ export default function OrderDetails() {
             <Tab label="Production" value="2" />
           </TabList>
         </Box>
-        <TabPanel value="1">
+        <TabPanel value="1" sx={{ px: { xs: "0" } }}>
           <Style po_number={query.get("po")} order={query.get("order")} />
         </TabPanel>
         <TabPanel value="2">

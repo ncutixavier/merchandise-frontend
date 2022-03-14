@@ -190,10 +190,12 @@ const Style = (props) => {
   };
 
   useEffect(() => {
-    dispatch(getAllStyles({
-      po_number: props.po_number,
-      order: props.order,
-    }));
+    dispatch(
+      getAllStyles({
+        po_number: props.po_number,
+        order: props.order,
+      })
+    );
   }, [dispatch, props]);
 
   const styles = useSelector((state) => state.getAllStyles);
@@ -213,9 +215,11 @@ const Style = (props) => {
         <Table sx={{ minWidth: 550 }} size="small" aria-label="simple table">
           <TableHead>
             <TableRow>
-              {["PO Number", "Buyer", "Created At", "Style", ""].map((cell, index) => (
-                <StyledTableCell key={index}>{cell}</StyledTableCell>
-              ))}
+              {["PO Number", "Buyer", "Created At", "Style", ""].map(
+                (cell, index) => (
+                  <StyledTableCell key={index}>{cell}</StyledTableCell>
+                )
+              )}
             </TableRow>
           </TableHead>
 
@@ -224,9 +228,7 @@ const Style = (props) => {
               <StyledTableRow key={row._id}>
                 <StyledTableCell>{row.purchaseOrder.po_number}</StyledTableCell>
                 <StyledTableCell>{row.order.buyer}</StyledTableCell>
-                <StyledTableCell>
-                  {row.createdAt.split("T")[0]}
-                </StyledTableCell>
+                <StyledTableCell>{row.createdAt.split("T")[0]}</StyledTableCell>
                 <StyledTableCell>
                   <a
                     href={row.image}
