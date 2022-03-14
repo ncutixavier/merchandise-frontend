@@ -8,6 +8,8 @@ import Home from "../pages/Home";
 import Orders from "../pages/Orders";
 import Samples from "../pages/Samples";
 import OrderDetails from "../pages/OrderDetails";
+import cookie from "js-cookie";
+import { Navigate } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
@@ -37,6 +39,14 @@ const theme = createTheme({
   },
 });
 
+const RequireAuth = ({ children }) => {
+  const token = cookie.get("token");
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
+
 const Index = () => {
   return (
     <ThemeProvider theme={theme}>
@@ -44,11 +54,22 @@ const Index = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="merchandise" element={<Layout />}>
+          <Route
+            path="merchandise"
+            element={
+              <RequireAuth>
+                <Layout />
+              </RequireAuth>
+            }
+          >
             <Route exact path="" element={<Admin />} />
             <Route exact path="Samples" element={<Samples />} />
             <Route exact path="Orders" element={<Orders />} />
-            <Route exact path="Orders/purchase_order" element={<OrderDetails />} />
+            <Route
+              exact
+              path="Orders/purchase_order"
+              element={<OrderDetails />}
+            />
           </Route>
         </Routes>
       </Router>
