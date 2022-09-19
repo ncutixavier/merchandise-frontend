@@ -93,7 +93,7 @@ const Samples = () => {
     sample.append("image", data.image[0]);
     sample.append("status", data.status);
 
-    dispatch(addNewSample(sample))
+    dispatch(addNewSample(sample)).unwrap()
       .then((res) => {
         setState({
           ...state,
@@ -126,6 +126,7 @@ const Samples = () => {
   const handleDelete = () => {
     setState({ ...state, loading: true });
     dispatch(deleteSample(state.sampleId))
+      .unwrap()
       .then((res) => {
         setState({
           ...state,
@@ -160,6 +161,7 @@ const Samples = () => {
     };
     setState({ ...state, loading: true });
     dispatch(updateSample(sample))
+      .unwrap()
       .then((res) => {
         setState({
           ...state,
