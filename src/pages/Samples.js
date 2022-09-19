@@ -42,13 +42,13 @@ export const ColorButton = styled(Button)(({ theme }) => ({
   color: "white",
 }));
 
- export const TopHeader = styled(Box)({
-   display: "flex",
-   alignItems: "center",
-   justifyContent: "space-between",
-   backgroundColor: "#fff",
-   padding: "1rem",
- });
+export const TopHeader = styled(Box)({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  backgroundColor: "#fff",
+  padding: "1rem",
+});
 
 const Samples = () => {
   const theme = useTheme();
@@ -65,7 +65,7 @@ const Samples = () => {
     editForm: "none",
     sampleId: "",
     openDeleteForm: false,
-    status: "Pending"
+    status: "Pending",
   });
 
   const validationSchema = Yup.object().shape({
@@ -114,27 +114,42 @@ const Samples = () => {
         }, 1000);
         dispatch(getAllSamples());
       })
+      .catch((res) => {
+        <Snackbar open={true}>
+          <Alert variant="filled" severity="error" sx={{ width: "100%" }}>
+            Error ocurred while performing, try again later!
+          </Alert>
+        </Snackbar>;
+      });
   };
 
   const handleDelete = () => {
     setState({ ...state, loading: true });
-    dispatch(deleteSample(state.sampleId)).then((res) => {
-      setState({
-        ...state,
-        openDeleteForm: false,
-        openSnackbar: true,
-        successMessage: "Sample deleted successfully",
-        loading: false,
-      });
-      setTimeout(() => {
+    dispatch(deleteSample(state.sampleId))
+      .then((res) => {
         setState({
           ...state,
-          openSnackbar: false,
           openDeleteForm: false,
+          openSnackbar: true,
+          successMessage: "Sample deleted successfully",
+          loading: false,
         });
-      }, 1000);
-      dispatch(getAllSamples());
-    });
+        setTimeout(() => {
+          setState({
+            ...state,
+            openSnackbar: false,
+            openDeleteForm: false,
+          });
+        }, 1000);
+        dispatch(getAllSamples());
+      })
+      .catch((res) => {
+        <Snackbar open={true}>
+          <Alert variant="filled" severity="error" sx={{ width: "100%" }}>
+            Error ocurred while performing, try again later!
+          </Alert>
+        </Snackbar>;
+      });
   };
 
   const handleUpdate = (data) => {
@@ -144,23 +159,31 @@ const Samples = () => {
       status: data.status,
     };
     setState({ ...state, loading: true });
-    dispatch(updateSample(sample)).then((res) => {
-      setState({
-        ...state,
-        open: false,
-        openSnackbar: true,
-        successMessage: "Sample updated successfully",
-        loading: false,
-      });
-      setTimeout(() => {
+    dispatch(updateSample(sample))
+      .then((res) => {
         setState({
           ...state,
-          openSnackbar: false,
           open: false,
+          openSnackbar: true,
+          successMessage: "Sample updated successfully",
+          loading: false,
         });
-      }, 1000);
-      dispatch(getAllSamples());
-    });
+        setTimeout(() => {
+          setState({
+            ...state,
+            openSnackbar: false,
+            open: false,
+          });
+        }, 1000);
+        dispatch(getAllSamples());
+      })
+      .catch((res) => {
+        <Snackbar open={true}>
+          <Alert variant="filled" severity="error" sx={{ width: "100%" }}>
+            Error ocurred while performing, try again later!
+          </Alert>
+        </Snackbar>;
+      });
   };
 
   const handleCreateForm = () => {
