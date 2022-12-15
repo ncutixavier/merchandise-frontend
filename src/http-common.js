@@ -2,7 +2,7 @@ import axios from "axios";
 import cookie from "js-cookie";
 
 const http = axios.create({
-  baseURL: "https://nx-merchandise.herokuapp.com/api/v1",
+  baseURL: "https://merchandise-backend.onrender.com/api/v1",
   // baseURL:"http://localhost:4000/api/v1",
   headers: {
     Authorization: cookie.get("token"),
